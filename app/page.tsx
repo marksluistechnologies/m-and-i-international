@@ -1,7 +1,7 @@
 "use client";
 import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, MeshStandardMaterial, Float, Stars, PresentationControls } from '@react-three/drei';
+import { Environment, Float, Stars, PresentationControls } from '@react-three/drei';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
 
@@ -24,7 +24,7 @@ function AnimatedLeatherSphere() {
         {/* Main, detailed polished leather sphere */}
         <mesh ref={sphereRef} scale={2.8} position={[4, 0, -2]}>
           <sphereGeometry args={[1, 100, 100]} />
-          <MeshStandardMaterial 
+          <meshStandardMaterial 
             color="#6F4E37" 
             roughness={0.7} 
             metalness={0.3} 
@@ -32,10 +32,9 @@ function AnimatedLeatherSphere() {
           />
         </mesh>
         
-        {/* Subtle secondary floating element */}
         <mesh scale={1.8} position={[-5, 3, -5]}>
           <sphereGeometry args={[1, 64, 64]} />
-          <MeshStandardMaterial 
+          <meshStandardMaterial 
             color="#D4AF37" 
             roughness={0.4} 
             metalness={0.9} 
