@@ -51,10 +51,40 @@ function AnimatedLeatherSphere() {
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const { scrollYProgress } = useScroll();
+
+  // Form State for Google Sheets
+  const [formStatus, setFormStatus] = useState({ loading: false, message: '', isSuccess: false });
   
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Submit Logic for Google Sheets
+  const submitToGoogleSheet = async (e: any) => {
+    e.preventDefault();
+    setFormStatus({ loading: true, message: 'Sending details...', isSuccess: false });
+    
+    const formData = new FormData(e.target);
+    
+    // YE URL REPLACE KARNA HAI APNE GOOGLE APPS SCRIPT URL SE (Tariqa niche diya hai)
+    const googleScriptURL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL"; 
+
+    try {
+      const response = await fetch(googleScriptURL, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setFormStatus({ loading: false, message: 'Inquiry Sent Successfully! We will contact you soon.', isSuccess: true });
+        e.target.reset();
+      } else {
+        setFormStatus({ loading: false, message: 'Error sending details. Please try again.', isSuccess: false });
+      }
+    } catch (error) {
+      setFormStatus({ loading: false, message: 'Network Error. Could not connect.', isSuccess: false });
+    }
+  };
 
   // Animation Variants
   const fadeUp: Variants = {
@@ -162,7 +192,7 @@ export default function Home() {
 
         {/* SECTION 2: HERITAGE (Factory Image/Video Card) */}
         <section id="heritage" className="py-40 px-6 md:px-24 relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-24 items-center max-w-7xl mx-auto">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeUp}>
               <h3 className="text-4xl md:text-6xl font-serif text-[#1F1F1F] mb-8 leading-tight">Crafting Excellence <br/>Since Generations</h3>
               <p className="text-[#1F1F1F]/80 font-light leading-relaxed mb-8 text-xl">
@@ -185,13 +215,13 @@ export default function Home() {
               whileInView={{ opacity: 1, scale: 1 }} 
               transition={{ duration: 1.2 }}
               viewport={{ once: true }}
-              className="h-[500px] w-full rounded-[3rem] bg-[#FAF8F1] border border-[#1F1F1F]/5 shadow-2xl relative overflow-hidden flex items-center justify-center group"
+              className="h-[400px] md:h-[500px] w-full rounded-[2rem] md:rounded-[3rem] bg-[#FAF8F1] border border-[#1F1F1F]/5 shadow-2xl relative overflow-hidden flex items-center justify-center group"
             >
               <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/factory-stitch.jpg')" }}></div>
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-all duration-700"></div>
               <div className="z-10 text-center">
-                 <div className="w-20 h-20 rounded-full border border-[#FAF8F1] flex items-center justify-center mx-auto mb-4 animate-pulse">
-                    <div className="w-0 h-0 border-t-[8px] border-t-transparent border-l-[12px] border-l-[#FAF8F1] border-b-[8px] border-b-transparent ml-1"></div>
+                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-[#FAF8F1] flex items-center justify-center mx-auto mb-4 animate-pulse">
+                    <div className="w-0 h-0 border-t-[6px] md:border-t-[8px] border-t-transparent border-l-[10px] md:border-l-[12px] border-l-[#FAF8F1] border-b-[6px] md:border-b-[8px] border-b-transparent ml-1"></div>
                  </div>
                  <p className="text-[#FAF8F1] tracking-[0.3em] text-[10px] font-bold uppercase">Experience Our Factory</p>
               </div>
@@ -201,14 +231,13 @@ export default function Home() {
 
         {/* SECTION 3: CATALOG (Fixed Mobile Grid & Light Theme) */}
         <section id="catalog" className="py-40 px-6 md:px-24 relative z-20 bg-[#FAF8F1]">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-32">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-24 md:mb-32">
             <h3 className="text-5xl md:text-7xl font-serif text-[#1F1F1F] mb-8 tracking-tight">Our Product Lines</h3>
             <div className="h-[2px] w-32 bg-[#8B5A2B] mx-auto mb-8"></div>
             <p className="text-[#1F1F1F]/80 max-w-2xl mx-auto font-light text-lg">Engineered for endurance and aesthetic perfection.</p>
           </motion.div>
 
-          {/* Changed mobile grid from too narrow to col-1 with better padding */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto">
             {[
               { title: "Saddles", tags: ["Dressage", "Jumping", "Polo"], desc: "Ergonomically designed for peak performance and rider safety.", img: "/catalog-saddle.jpg" },
               { title: "Apparel", tags: ["Boots", "Jackets", "Chaps"], desc: "High-grade leather garments tailored for durability and style.", img: "/catalog-apparel.jpg" },
@@ -219,13 +248,13 @@ export default function Home() {
                 initial="hidden" whileInView="visible" viewport={{ once: true }} 
                 variants={{ hidden: { opacity: 0, y: 100 }, visible: { opacity: 1, y: 0, transition: { delay: index * 0.2, duration: 1 } } }}
                 whileHover={{ y: -15 }}
-                className="p-10 md:p-12 lg:p-16 rounded-[3rem] bg-white border border-[#1F1F1F]/5 flex flex-col items-start text-left group transition-all duration-500 hover:border-[#8B5A2B]/20 shadow-2xl relative overflow-hidden"
+                className="p-8 md:p-12 lg:p-16 rounded-[2rem] md:rounded-[3rem] bg-white border border-[#1F1F1F]/5 flex flex-col items-start text-left group transition-all duration-500 hover:border-[#8B5A2B]/20 shadow-2xl relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-cover bg-center bg-no-repeat group-hover:scale-110 transition-transform duration-700 opacity-0 group-hover:opacity-100" style={{ backgroundImage: `url(${item.img})` }}></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-0 opacity-0 group-hover:opacity-100" />
 
                 <span className="text-[#8B5A2B] group-hover:text-[#FAF8F1] text-[10px] font-bold tracking-[0.4em] mb-4 uppercase z-10 transition-colors">Category 0{index + 1}</span>
-                <h4 className="text-4xl font-serif text-[#1F1F1F] group-hover:text-[#FAF8F1] mb-6 transition-colors z-10">{item.title}</h4>
+                <h4 className="text-3xl md:text-4xl font-serif text-[#1F1F1F] group-hover:text-[#FAF8F1] mb-6 transition-colors z-10">{item.title}</h4>
                 <div className="flex flex-wrap gap-2 mb-8 z-10">
                   {item.tags.map(tag => (
                     <span key={tag} className="text-[9px] border border-[#1F1F1F]/15 group-hover:border-[#FAF8F1]/40 px-3 py-1 rounded-full text-gray-700 group-hover:text-[#FAF8F1] uppercase tracking-widest transition-colors">{tag}</span>
@@ -240,19 +269,18 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 4: B2B PORTAL (Form Mobile Fixed & Light Theme) */}
+        {/* SECTION 4: B2B PORTAL (Form Mobile Fixed, Wide & Logic Added) */}
         <section id="b2b" className="py-40 px-6 md:px-24 relative z-20">
           <div className="max-w-6xl mx-auto">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="p-12 md:p-24 rounded-[4rem] bg-white border border-[#1F1F1F]/5backdrop-blur-3xl relative overflow-hidden shadow-2xl">
-              <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[#D4AF37] rounded-full blur-[200px] opacity-10 pointer-events-none"></div>
+            {/* Removed the gold background blur from here and adjusted mobile padding */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="p-6 md:p-24 rounded-[2rem] md:rounded-[4rem] bg-white border border-[#1F1F1F]/5 backdrop-blur-3xl relative overflow-hidden shadow-2xl">
               
-              {/* Added flex-col for mobile and made form full width */}
-              <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 relative z-10">
+              <div className="flex flex-col lg:flex-row gap-12 lg:gap-24 relative z-10">
                 <div className="lg:w-1/2">
-                  <h3 className="text-4xl md:text-6xl font-serif text-[#1F1F1F] mb-10 leading-tight">Global Trade <br/>Partnership</h3>
-                  <p className="text-[#1F1F1F]/80 mb-12 text-xl font-light leading-relaxed">Connect with our export team to discuss bulk sourcing, OEM solutions, and factory visits.</p>
+                  <h3 className="text-4xl md:text-6xl font-serif text-[#1F1F1F] mb-8 md:mb-10 leading-tight">Global Trade <br/>Partnership</h3>
+                  <p className="text-[#1F1F1F]/80 mb-10 md:mb-12 text-lg md:text-xl font-light leading-relaxed">Connect with our export team to discuss bulk sourcing, OEM solutions, and factory visits.</p>
                   
-                  <div className="space-y-10 border-t border-[#1F1F1F]/5 pt-12">
+                  <div className="space-y-8 md:space-y-10 border-t border-[#1F1F1F]/5 pt-10 md:pt-12">
                     <div className="flex items-start space-x-6">
                        <div className="w-12 h-12 rounded-full border border-[#8B5A2B] flex-shrink-0 flex items-center justify-center text-[#8B5A2B] text-sm font-bold italic">M</div>
                        <div>
@@ -270,56 +298,78 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Made form full width on mobile */}
-                <form className="w-full lg:w-1/2 space-y-8 bg-white/30 p-8 md:p-12 rounded-[2rem] border border-[#1F1F1F]/5backdrop-blur-md">
-                  <div className="space-y-6">
-                    <input type="text" placeholder="Your Full Name" className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-5 rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm" />
-                    <input type="text" placeholder="Company Name" className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-5 rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm" />
-                    <input type="email" placeholder="Business Email" className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-5 rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm" />
-                    <textarea placeholder="Specify product requirements, MOQ, and white-label interest..." rows={4} className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-5 rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm resize-none"></textarea>
+                {/* Form Logic Added, Mobile Width Fixed */}
+                <form onSubmit={submitToGoogleSheet} className="w-full lg:w-1/2 space-y-6 md:space-y-8 bg-[#FAF8F1]/50 p-6 md:p-12 rounded-[1.5rem] md:rounded-[2rem] border border-[#1F1F1F]/5">
+                  <div className="space-y-4 md:space-y-6">
+                    <input required name="name" type="text" placeholder="Your Full Name" className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-4 md:p-5 rounded-xl md:rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm" />
+                    <input required name="company" type="text" placeholder="Company Name" className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-4 md:p-5 rounded-xl md:rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm" />
+                    <input required name="email" type="email" placeholder="Business Email" className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-4 md:p-5 rounded-xl md:rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm" />
+                    <textarea required name="requirements" placeholder="Specify product requirements, MOQ, and white-label interest..." rows={4} className="w-full bg-[#FAF8F1] border border-[#1F1F1F]/10 p-4 md:p-5 rounded-xl md:rounded-2xl text-[#1F1F1F] focus:border-[#8B5A2B] outline-none transition text-sm resize-none"></textarea>
                   </div>
-                  <button type="button" className="w-full bg-[#8B5A2B] text-white font-black tracking-[0.3em] py-6 rounded-2xl hover:scale-[1.02] transition-all duration-500 text-xs shadow-xl shadow-[#8B5A2B]/15">
-                    INITIATE TRADE INQUIRY
+                  <button type="submit" disabled={formStatus.loading} className="w-full bg-[#8B5A2B] text-white font-black tracking-[0.2em] md:tracking-[0.3em] py-5 md:py-6 rounded-xl md:rounded-2xl hover:scale-[1.02] transition-all duration-500 text-xs shadow-xl shadow-[#8B5A2B]/15 disabled:opacity-50 disabled:hover:scale-100">
+                    {formStatus.loading ? 'SENDING...' : 'INITIATE TRADE INQUIRY'}
                   </button>
+                  {formStatus.message && (
+                    <p className={`text-xs text-center font-bold mt-4 ${formStatus.isSuccess ? 'text-green-600' : 'text-red-500'}`}>
+                      {formStatus.message}
+                    </p>
+                  )}
                 </form>
+
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* SECTION 5: FOOTER (Developer Credit & Light Theme) */}
-        <footer className="bg-[#1F1F1F] pt-32 pb-16 px-6 md:px-24 border-t border-[#1F1F1F]/5relative z-20">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-24 max-w-7xl mx-auto">
-            <div className="md:col-span-5">
-              <h1 className="text-4xl font-serif text-[#D4AF37] tracking-[0.3em] font-bold mb-8 italic">M & I.</h1>
-              <p className="text-gray-400 font-light text-lg leading-relaxed max-w-sm">Crafting Kanpur's legacy into world-class equestrian leather. Redefining global B2B sourcing standards.</p>
+        {/* SECTION 5: FOOTER (Fully Responsive & Social Added) */}
+        <footer className="bg-[#1F1F1F] pt-24 md:pt-32 pb-12 md:pb-16 px-6 md:px-24 border-t border-[#1F1F1F]/5 relative z-20">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 mb-16 md:mb-24 max-w-7xl mx-auto">
+            <div className="md:col-span-5 text-center md:text-left">
+              <h1 className="text-3xl md:text-4xl font-serif text-[#D4AF37] tracking-[0.3em] font-bold mb-6 md:mb-8 italic">M & I.</h1>
+              <p className="text-gray-400 font-light text-base md:text-lg leading-relaxed mx-auto md:mx-0 max-w-sm">Crafting Kanpur's legacy into world-class equestrian leather. Redefining global B2B sourcing standards.</p>
             </div>
-            <div className="md:col-span-3">
-              <h5 className="text-[#FAF8F1] font-bold mb-10 text-[10px] uppercase tracking-[0.3em]">Quick Navigation</h5>
-              <ul className="space-y-5 text-gray-500 font-light text-sm uppercase tracking-widest">
+            <div className="md:col-span-3 text-center md:text-left">
+              <h5 className="text-[#FAF8F1] font-bold mb-6 md:mb-10 text-[10px] uppercase tracking-[0.3em]">Quick Navigation</h5>
+              <ul className="space-y-4 md:space-y-5 text-gray-500 font-light text-xs md:text-sm uppercase tracking-widest">
                 <li><a href="#hero" className="hover:text-[#D4AF37] transition">The Start</a></li>
                 <li><a href="#catalog" className="hover:text-[#D4AF37] transition">Our Products</a></li>
                 <li><a href="#heritage" className="hover:text-[#D4AF37] transition">The Heritage</a></li>
                 <li><a href="#b2b" className="hover:text-[#D4AF37] transition">Trade Portal</a></li>
               </ul>
             </div>
-            <div className="md:col-span-4">
-              <h5 className="text-[#FAF8F1] font-bold mb-10 text-[10px] uppercase tracking-[0.3em]">Global Headquarters</h5>
-              <p className="text-gray-500 font-light text-sm leading-loose mb-6">
+            <div className="md:col-span-4 text-center md:text-left">
+              <h5 className="text-[#FAF8F1] font-bold mb-6 md:mb-10 text-[10px] uppercase tracking-[0.3em]">Global Headquarters</h5>
+              <p className="text-gray-500 font-light text-xs md:text-sm leading-loose mb-4 md:mb-6">
                 Kanpur Industrial Area, <br/>Uttar Pradesh, 208001, India
               </p>
-              <p className="text-[#D4AF37] font-bold text-sm tracking-widest">export@mandi-international.com</p>
+              <a href="mailto:page.miinternational@gmail.com" className="text-[#D4AF37] font-bold text-xs md:text-sm tracking-widest hover:text-white transition block">page.miinternational@gmail.com</a>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-12 flex flex-col md:flex-row justify-between items-center text-[9px] text-gray-600 tracking-[0.4em] uppercase font-bold">
-            <p>© 2026 M & I INTERNATIONAL TRADE CO.</p>
+          
+          <div className="border-t border-gray-800 pt-8 md:pt-12 flex flex-col md:flex-row justify-between items-center text-[9px] text-gray-600 tracking-[0.2em] md:tracking-[0.4em] uppercase font-bold text-center">
+            <p className="mb-6 md:mb-0">© 2026 M & I INTERNATIONAL TRADE CO.</p>
             
-            {/* Malik Innovations Developer Credit */}
-            <div className="flex space-x-10 mt-8 md:mt-0 items-center">
-               <a href="#" className="hover:text-[#FAF8F1] transition">Privacy</a>
-               <a href="#" className="hover:text-[#FAF8F1] transition">compliance</a>
-               <div className="h-4 w-[1px] bg-gray-800"></div>
-               <div className="flex space-x-2 text-gray-600">
+            {/* Mobile Wrap fix: flex-wrap or flex-col */}
+            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 space-x-0 md:space-x-10 items-center">
+               
+               {/* Social Icons */}
+               <div className="flex space-x-6 mb-4 md:mb-0">
+                  <a href="https://www.facebook.com/m.i.international" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition">
+                    <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" /></svg>
+                  </a>
+                  <a href="https://www.instagram.com/m.i.international" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition">
+                    <svg fill="currentColor" viewBox="0 0 24 24" className="w-4 h-4 md:w-5 md:h-5"><path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" /></svg>
+                  </a>
+               </div>
+
+               <div className="flex space-x-6 mb-4 md:mb-0">
+                  <a href="#" className="hover:text-[#FAF8F1] transition">Privacy</a>
+                  <a href="#" className="hover:text-[#FAF8F1] transition">Compliance</a>
+               </div>
+               
+               <div className="hidden md:block h-4 w-[1px] bg-gray-800"></div>
+               
+               <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-2 text-gray-600">
                    <span>Made with ❤️ by</span>
                    <a href="https://malik-innovations.vercel.app" target="_blank" rel="noopener noreferrer" className="text-[#8B5A2B] hover:text-[#D4AF37] transition-all font-black">Malik Innovations</a>
                </div>
